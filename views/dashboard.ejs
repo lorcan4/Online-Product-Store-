@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #5d78ff;
+            --secondary-color: #f8f9fa;
+            --dark-color: #343a40;
+            --light-color: #ffffff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: var(--light-color);
+            box-shadow: var(--box-shadow);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .user-icon {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        .user-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-email {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .cart-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+        }
+        
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .products-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .product-card {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #e1e5eb;
+        }
+        
+        .product-details {
+            padding: 1rem;
+        }
+        
+        .product-details ul {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+        
+        .product-details li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .product-details li:last-child {
+            border-bottom: none;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        
+        .quantity-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .quantity-btn:hover {
+            background: #4a66d6;
+        }
+        
+        .quantity-btn.minus {
+            background: var(--danger-color);
+        }
+        
+        .quantity-btn.minus:hover {
+            background: #c82333;
+        }
+        
+        .quantity-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin: 0 1rem;
+        }
+        
+        .buy-btn {
+            display: block;
+            width: 100%;
+            padding: 0.7rem;
+            background: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .buy-btn:hover {
+            background: #218838;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h3 {
+            color: var(--primary-color);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 120, 255, 0.2);
+        }
+        
+        .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #4a66d6;
+        }
+        
+        .empty-message {
+            text-align: center;
+            color: #666;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="#" class="logo">LorShop</a>
+        <div class="user-info">
+            <% if (user) { %>
+                <div class="user-details">
+                    <i class="fas fa-user-circle user-icon"></i>
+                    <div class="user-text">
+                        <span class="user-name"><%= user.FirstName %> <%= user.LastName %></span>
+                        <span class="user-email"><%= user.email %></span>
+                    </div>
+                </div>
+            <% } %>
+            
+            <div class="cart-icon" id="cartIcon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+            
+            <a href="/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="welcome-message">Welcome to Your Dashboard</h2>
+        
+        <% if(result.length> 0){ %>
+            <div class="products-container">
+                <% result.forEach(item=> { %>
+                    <div class="product-card" data-id="<%= item.iDProduct %>">
+                        <img src="../storage-img/<%= item.imagesUrl %>" alt="<%= item.categories %>" class="product-image">
+                        <div class="product-details">
+                            <ul>
+                                <li><strong>Category:</strong> <%= item.categories %></li>
+                                <li><strong>Description:</strong> <%= item.descriptions %></li>
+                                <li><strong>Price:</strong> $<%= item.prices %></li>
+                            </ul>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus">-</button>
+                                <span class="quantity-display">0</span>
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="empty-message">
+                No products available at the moment. Please check back later.
+            </div>
+        <% } %>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Complete Your Purchase</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="purchaseForm">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required 
+                           value="<%= user ? `${user.FirstName} ${user.LastName}` : '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required 
+                           value="<%= user ? user.email : '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Shipping Address</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+                <button type="submit" class="submit-btn">Confirm Purchase</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Shopping cart functionality
+            const cart = [];
+            const cartCount = document.getElementById('cartCount');
+            const cartIcon = document.getElementById('cartIcon');
+            const purchaseModal = document.getElementById('purchaseModal');
+            const closeModal = document.getElementById('closeModal');
+            const purchaseForm = document.getElementById('purchaseForm');
+            
+            // Initialize counters for each product
+            const productCards = document.querySelectorAll('.product-card');
+            
+            productCards.forEach(card => {
+                let count = 0;
+                const plusBtn = card.querySelector('.plus');
+                const minusBtn = card.querySelector('.minus');
+                const quantityDisplay = card.querySelector('.quantity-display');
+                const buyBtn = card.querySelector('.buy-btn');
+                const productId = card.getAttribute('data-id');
+                const productPrice = card.querySelector('li:nth-child(3)').textContent.replace('Price: $', '');
+                const productName = card.querySelector('li:nth-child(2)').textContent.replace('Description: ', '');
+                
+                plusBtn.addEventListener('click', () => {
+                    count++;
+                    quantityDisplay.textContent = count;
+                });
+                
+                minusBtn.addEventListener('click', () => {
+                    if (count > 0) count--;
+                    quantityDisplay.textContent = count;
+                });
+                
+                buyBtn.addEventListener('click', () => {
+                    if (count > 0) {
+                        // Add to cart or update existing item
+                        const existingItemIndex = cart.findIndex(item => item.id === productId);
+                        if (existingItemIndex !== -1) {
+                            cart[existingItemIndex].quantity += count;
+                        } else {
+                            cart.push({
+                                id: productId,
+                                name: productName,
+                                price: parseFloat(productPrice),
+                                quantity: count,
+                                image: card.querySelector('.product-image').src
+                            });
+                        }
+                        
+                        // Update cart count
+                        updateCartCount();
+                        
+                        // Reset counter
+                        count = 0;
+                        quantityDisplay.textContent = count;
+                        
+                        // Show success message
+                        alert(`${productName} (${count} items) added to cart!`);
+                    } else {
+                        alert('Please select at least 1 item');
+                    }
+                });
+            });
+            
+            // Cart icon click handler
+            cartIcon.addEventListener('click', () => {
+                if (cart.length > 0) {
+                    purchaseModal.style.display = 'flex';
+                } else {
+                    alert('Your cart is empty!');
+                }
+            });
+            
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                purchaseModal.style.display = 'none';
+            });
+            
+            // Form submission
+            purchaseForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Here you would typically send the data to your server
+                const formData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    cart: cart
+                };
+                
+                console.log('Purchase data:', formData);
+                
+                // Show success message
+                alert('Thank you for your purchase! We will contact you soon.');
+                
+                // Close modal and reset cart
+                purchaseModal.style.display = 'none';
+                cart.length = 0;
+                updateCartCount();
+                
+                // Reset all quantity displays
+                document.querySelectorAll('.quantity-display').forEach(display => {
+                    display.textContent = '0';
+                });
+            });
+            
+            // Update cart count display
+            function updateCartCount() {
+                const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+                cartCount.textContent = totalItems;
+            }
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === purchaseModal) {
+                    purchaseModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
